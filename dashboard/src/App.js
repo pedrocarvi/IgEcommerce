@@ -17,9 +17,9 @@ import PrivateRouter from "./PrivateRouter";
 import { useDispatch, useSelector } from "react-redux";
 import { listProducts } from "./Redux/Actions/ProductActions";
 import { listOrders } from "./Redux/Actions/OrderActions";
+import CategoryEditScreen from "./screens/CategoryEditScreen";
 
 function App() {
-
   const dispatch = useDispatch();
 
   const userLogin = useSelector((state) => state.userLogin);
@@ -46,6 +46,10 @@ function App() {
           <PrivateRouter
             path="/product/:id/edit"
             component={ProductEditScreen}
+          />
+          <PrivateRouter
+            path="/categories/:id/edit"
+            component={CategoryEditScreen}
           />
           <Route path="/login" component={Login} />
           <PrivateRouter path="*" component={NotFound} />

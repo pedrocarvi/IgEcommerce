@@ -7,7 +7,7 @@ import { editProduct, updateProduct } from "../../Redux/Actions/ProductActions";
 import Loading from "../LoadingError/Loading";
 import Message from "../LoadingError/Error";
 import { PRODUCT_UPDATE_RESET } from "../../Redux/Constants/ProductConstants";
-
+import { listCategories } from "../../Redux/Actions/CategoryActions.js";
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -24,6 +24,7 @@ const EditProductMain = (props) => {
   const [image, setImage] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
 
   const dispatch = useDispatch();
 
@@ -37,7 +38,11 @@ const EditProductMain = (props) => {
     success: successUpdate,
   } = productUpdate;
 
+  const categoryList = useSelector((state) => state.categoryList);
+  const { categories } = categoryList;
+
   useEffect(() => {
+    dispatch(listCategories());
     if (successUpdate) {
       dispatch({ type: PRODUCT_UPDATE_RESET });
       toast.success("Product Updated", ToastObjects);
@@ -50,6 +55,7 @@ const EditProductMain = (props) => {
         setCountInStock(product.countInStock);
         setImage(product.image);
         setPrice(product.price);
+        setCategory(product.category);
       }
     }
   }, [product, dispatch, productId, successUpdate]);
@@ -64,9 +70,12 @@ const EditProductMain = (props) => {
         description,
         image,
         countInStock,
+        category,
       })
     );
   };
+
+  var options = JSON.parse(JSON.stringify(categories));
 
   return (
     <>
@@ -113,6 +122,29 @@ const EditProductMain = (props) => {
                           onChange={(e) => setName(e.target.value)}
                         />
                       </div>
+                      <div className="mb-4">
+                        <label
+                          htmlFor="product_category"
+                          className="form-label"
+                        >
+                          Category
+                        </label>
+                        <select
+                          name="category"
+                          value={category}
+                          className="form-control"
+                          id="product_category"
+                          required
+                          onChange={(e) => setCategory(e.target.value)}
+                        >
+                          {Object.values(options).map((category, index) => (
+                            <option key={index} value={category._id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mb-4"></div>
                       <div className="mb-4">
                         <label htmlFor="product_price" className="form-label">
                           Price
