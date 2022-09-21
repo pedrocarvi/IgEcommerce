@@ -1,13 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Product from "./Product";
 import { useDispatch, useSelector } from "react-redux";
-import { listProducts } from "../../Redux/Actions/ProductActions";
+import {
+  listProducts,
+  listProductsByCategory,
+} from "../../Redux/Actions/ProductActions";
 import Loading from "../LoadingError/Loading";
 import Message from "../LoadingError/Error";
+import { listCategories } from "../../Redux/Actions/CategoryActions";
 
 const MainProducts = () => {
   const dispatch = useDispatch();
+
+  const [category, setCategory] = useState("");
 
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
@@ -15,9 +21,20 @@ const MainProducts = () => {
   const productDelete = useSelector((state) => state.productDelete);
   const { error: errorDelete, success: successDelete } = productDelete;
 
+  const categoryList = useSelector((state) => state.categoryList);
+  const { categories } = categoryList;
+
   useEffect(() => {
-    dispatch(listProducts());
-  }, [dispatch, successDelete]);
+    dispatch(listCategories());
+    if (category === "" || category === "All") {
+      dispatch(listProducts());
+    } else {
+      dispatch(listProductsByCategory(category));
+    }
+    console.log(products);
+  }, [dispatch, successDelete, category]);
+
+  var options = JSON.parse(JSON.stringify(categories));
 
   return (
     <section className="content-main">
@@ -41,11 +58,17 @@ const MainProducts = () => {
               />
             </div>
             <div className="col-lg-2 col-6 col-md-3">
-              <select className="form-select">
-                <option>All category</option>
-                <option>Electronics</option>
-                <option>Clothings</option>
-                <option>Something else</option>
+              <select
+                className="form-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value={"All"}>All</option>
+                {Object.values(options).map((category, index) => (
+                  <option key={index} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-lg-2 col-6 col-md-3">

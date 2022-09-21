@@ -1,5 +1,6 @@
 import express from "express";
 import asyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 import { admin, protect } from "../Middleware/AuthMiddleware.js";
 import Product from "../Models/ProductModel.js";
 
@@ -76,7 +77,8 @@ productRoute.post(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const { name, price, description, image, countInStock } = req.body;
+    const { name, price, description, image, countInStock, category } =
+      req.body;
     const productExist = await Product.findOne({ name });
     if (productExist) {
       res.status(400);
@@ -88,6 +90,7 @@ productRoute.post(
         description,
         image,
         countInStock,
+        category,
         user: req.user._id,
       });
       if (product) {
@@ -107,7 +110,8 @@ productRoute.put(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const { name, price, description, image, countInStock } = req.body;
+    const { name, price, description, image, countInStock, category } =
+      req.body;
     const product = await Product.findById(req.params.id);
     if (product) {
       product.name = name || product.name;
@@ -115,12 +119,29 @@ productRoute.put(
       product.description = description || product.description;
       product.image = image || product.image;
       product.countInStock = countInStock || product.countInStock;
+      product.category = category || product.category;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
       res.status(404);
       throw new Error("Product not found");
+    }
+  })
+);
+
+// Get products by category id
+productRoute.get(
+  "/byCategory/:id",
+  asyncHandler(async (req, res) => {
+    const product = await Product.find({
+      category: mongoose.Types.ObjectId(req.params.id),
+    });
+    if (product) {
+      res.json(product);
+    } else {
+      res.status(404);
+      throw new Error("Product not Found");
     }
   })
 );

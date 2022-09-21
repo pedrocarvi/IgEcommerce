@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Actions/userActions";
-import { BsCart } from 'react-icons/bs'
+import { BsCart } from "react-icons/bs";
+import { listCategories } from "../Redux/Actions/CategoryActions";
 
 const Header = () => {
+  const [keyword, setKeyword] = useState();
 
-  const [keyword, setKeyword] = useState()
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
-
-  let history = useHistory()
+  let history = useHistory();
 
   const cart = useSelector((state) => state.cart);
   const { cartItems } = cart;
@@ -18,9 +18,16 @@ const Header = () => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
+  const categoryList = useSelector((state) => state.categoryList);
+  const { categories } = categoryList;
+
+  useEffect(() => {
+    dispatch(listCategories());
+  }, [dispatch]);
+
   const logoutHandler = () => {
-    dispatch(logout())
-  }
+    dispatch(logout());
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -30,6 +37,10 @@ const Header = () => {
       history.push("/");
     }
   };
+
+  if (categories) {
+    var options = JSON.parse(JSON.stringify(categories));
+  }
 
   return (
     <div>
@@ -92,7 +103,11 @@ const Header = () => {
                           Profile
                         </Link>
 
-                        <Link className="dropdown-item" to="#" onClick={logoutHandler}>
+                        <Link
+                          className="dropdown-item"
+                          to="#"
+                          onClick={logoutHandler}
+                        >
                           Logout
                         </Link>
                       </div>
@@ -126,7 +141,7 @@ const Header = () => {
                   </Link>
                 </div>
                 <div className="col-12 d-flex align-items-center">
-                <form onSubmit={submitHandler} className="input-group">
+                  <form onSubmit={submitHandler} className="input-group">
                     <input
                       type="search"
                       className="form-control rounded search"
@@ -146,13 +161,13 @@ const Header = () => {
           <div className="pc-header">
             <div className="row">
               <div className="col-md-3 col-4 d-flex align-items-center">
-              <Link className="navbar-brand" to="/">
-                    {/* <img alt="logo" src="/images/logo.png" /> */}
-                    <p> Ideas Gastronomicas </p>
-                  </Link>
+                <Link className="navbar-brand" to="/">
+                  {/* <img alt="logo" src="/images/logo.png" /> */}
+                  <p> Ideas Gastronomicas </p>
+                </Link>
               </div>
               <div className="col-md-6 col-8 d-flex align-items-center justify-content-center">
-              <form onSubmit={submitHandler} className="input-group">
+                <form onSubmit={submitHandler} className="input-group">
                   <input
                     type="search"
                     className="form-control rounded search"
@@ -181,7 +196,11 @@ const Header = () => {
                         Ver perfil
                       </Link>
 
-                      <Link className="dropdown-item" to="#" onClick={logoutHandler}>
+                      <Link
+                        className="dropdown-item"
+                        to="#"
+                        onClick={logoutHandler}
+                      >
                         Cerrar sesion
                       </Link>
                     </div>
@@ -195,9 +214,22 @@ const Header = () => {
                 )}
 
                 <Link to="/cart">
-                  <BsCart size="1.8rem"/>
+                  <BsCart size="1.8rem" />
                   <span className="badge"> {cartItems.length} </span>
                 </Link>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-6 d-flex align-items-center display-none">
+                <ul>
+                  {Object.values(options).map((category, index) => (
+                    <li value={category}>
+                      <Link to={`/byCategory/${category._id}`}>
+                        {category.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>

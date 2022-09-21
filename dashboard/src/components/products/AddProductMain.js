@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { PRODUCT_CREATE_RESET } from "../../Redux/Constants/ProductConstants.js";
 import { createProduct } from "./../../Redux/Actions/ProductActions.js";
-import Toast from '../LoadingError/Toast'
+import Toast from "../LoadingError/Toast";
 import Message from "../LoadingError/Error.js";
 import Loading from "../LoadingError/Loading.js";
+import { listCategories } from "../../Redux/Actions/CategoryActions.js";
 
 const ToastObjects = {
   pauseOnFocusLoss: false,
@@ -15,21 +16,24 @@ const ToastObjects = {
   autoClose: 2000,
 };
 
-
-const AddProductMain = () => { 
-
+const AddProductMain = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [image, setImage] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
 
   const dispatch = useDispatch();
 
   const productCreate = useSelector((state) => state.productCreate);
   const { loading, error, product } = productCreate;
 
+  const categoryList = useSelector((state) => state.categoryList);
+  const { categories } = categoryList;
+
   useEffect(() => {
+    dispatch(listCategories());
     if (product) {
       toast.success("Product Added", ToastObjects);
       dispatch({ type: PRODUCT_CREATE_RESET });
@@ -38,17 +42,22 @@ const AddProductMain = () => {
       setCountInStock(0);
       setImage("");
       setPrice(0);
+      setCategory("");
     }
   }, [product, dispatch]);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(createProduct(name, price, description, image, countInStock));
+    dispatch(
+      createProduct(name, price, description, image, countInStock, category)
+    );
   };
+
+  var options = JSON.parse(JSON.stringify(categories));
 
   return (
     <>
-      <Toast/>
+      <Toast />
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={submitHandler}>
           <div className="content-header">
@@ -82,6 +91,28 @@ const AddProductMain = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="product_category" className="form-label">
+                      Category
+                    </label>
+                    <select
+                      name="category"
+                      value={category || ""}
+                      className="form-control"
+                      id="product_category"
+                      onChange={(e) => setCategory(e.target.value || null)}
+                      required
+                    >
+                      <option disabled value="">
+                        None
+                      </option>
+                      {Object.values(options).map((category, index) => (
+                        <option selected key={index} value={category._id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-4">
                     <label htmlFor="product_price" className="form-label">
