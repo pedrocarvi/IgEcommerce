@@ -16,15 +16,6 @@ export const listProduct =
     try {
       dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      // if (keyword !== "" && pageNumber !== "") {
-      //   const { data } = await axios.get(
-      //     `/api/products/?keyword=${keyword}&pageNumber=${pageNumber}`
-      //   );
-      //   dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
-      // } else {
-      //   const { data } = await axios.get(`/api/products`);
-      //   dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
-      // }
       const { data } = await axios.get(
         `/api/products/?keyword=${keyword}&pageNumber=${pageNumber}`
       );
