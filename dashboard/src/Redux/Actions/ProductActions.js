@@ -187,3 +187,22 @@ export const updateProduct = (product) => async (dispatch, getState) => {
     });
   }
 };
+
+export const listProductsByCategory = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: PRODUCT_LIST_REQUEST });
+
+    const { data } = await axios.get(`/api/products/byCategory/${id}`);
+
+    dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+    dispatch({
+      type: PRODUCT_LIST_FAIL,
+      payload: message,
+    });
+  }
+};
